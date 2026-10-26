@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Headset, LineChart, LogOut, RefreshCw, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, Headset, LineChart, LogOut, RefreshCw, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { ct, type ConsoleKey } from '../../i18n/consoleText';
 import * as consoleApi from '../../api/agentConsole';
 import type { CaseDetail, CaseSummary, QueueStats } from '../../api/agentConsole';
@@ -99,10 +99,12 @@ export function AgentConsolePage() {
     return () => clearInterval(timer);
   }, [signedIn, refresh, selectedId, key]);
 
-  async function act(action: () => Promise<CaseDetail>) {
+  async function act(action: () => Promise<CaseDetail>, scrollTop = false) {
     setError('');
     try {
       setSelected(await action());
+      // On phones the case replaces the queue (one column): start it at the top.
+      if (scrollTop) window.scrollTo?.({ top: 0 });
       await refresh();
     } catch {
       setError(ct('console.error'));
@@ -154,7 +156,7 @@ export function AgentConsolePage() {
         </div>
       </header>
 
-      <div className="console-body">
+      <div className={`console-body${selected ? ' has-selection' : ''}`}>
         {/* 1. Ticket queue */}
         <aside className="console-list" aria-label={ct('console.queue')}>
           <div className="console-kpis">
@@ -177,7 +179,7 @@ export function AgentConsolePage() {
               <li key={c.case_id}>
                 <button
                   className={`console-case${selectedId === c.case_id ? ' selected' : ''}`}
-                  onClick={() => void act(() => consoleApi.getCase(key, c.case_id))}
+                  onClick={() => void act(() => consoleApi.getCase(key, c.case_id), true)}
                 >
                   <span className={`console-status ${c.status}`}>{ct(`console.status.${c.status}`)}</span>
                   <span><strong>{c.case_id}</strong> · {c.customer ?? '—'}</span>
@@ -204,6 +206,9 @@ export function AgentConsolePage() {
           <>
             {/* 2. Dialog: Nova's conversation, then the agent's */}
             <main className="console-dialog" aria-label={ct('console.dialog')}>
+              <button type="button" className="btn-ghost console-back" onClick={() => setSelected(null)}>
+                <ArrowLeft size={16} aria-hidden="true" /> {ct('console.back')}
+              </button>
               <div className="console-detail-header">
                 <h2>{selected.case_id}</h2>
                 <span className={`console-status ${selected.status}`}>

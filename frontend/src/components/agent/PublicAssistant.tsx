@@ -5,6 +5,7 @@ import { useApp } from '../../context/AppContext';
 import { t } from '../../i18n/translations';
 import * as api from '../../api/client';
 import { limitReason } from '../../api/client';
+import { useMobilePanel } from '../../hooks/useMobilePanel';
 import '../../styles/agent.css';
 
 const USE_MOCK = import.meta.env.VITE_MOCK === '1';
@@ -29,6 +30,8 @@ export function PublicAssistant() {
   const sessionRef = useRef<string | null>(null);
   const nextId = useRef(1);
   const endRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useMobilePanel(panelRef, isOpen);
 
   useEffect(() => {
     endRef.current?.scrollIntoView?.({ behavior: 'smooth' });
@@ -107,12 +110,23 @@ export function PublicAssistant() {
       </div>
 
       {isOpen && (
-        <div className="agent-panel" role="complementary" aria-label={t('public.title', language)}>
+        <div ref={panelRef} className="agent-panel" role="complementary" aria-label={t('public.title', language)}>
           <div className="agent-panel-header">
             <div className="agent-avatar" aria-hidden="true">N</div>
             <div>
               <div className="agent-name">Nova</div>
               <div className="agent-status-dot">{t('public.title', language)}</div>
+            </div>
+            {/* On phones the panel covers the floating button, so the header needs its own close. */}
+            <div className="agent-panel-actions">
+              <button
+                className="panel-action-btn"
+                onClick={() => setIsOpen(false)}
+                aria-label={t('public.close', language)}
+                title={t('public.close', language)}
+              >
+                <X size={14} />
+              </button>
             </div>
           </div>
 
