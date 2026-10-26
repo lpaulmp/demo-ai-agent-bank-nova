@@ -266,13 +266,23 @@ mark.claim.unsupported { background: #fbe9e9; box-shadow: inset 0 -2px 0 #d03b3b
 .console-action-buttons { display: flex; gap: var(--space-2); flex-wrap: wrap; }
 .console-empty { color: var(--color-text-muted); font-size: var(--text-sm); padding: var(--space-4); }
 
+/* Back to the queue: only in the one-column (phone) layout, where the case replaces the list. */
+.console-back { display: none; align-self: flex-start; align-items: center; gap: 4px; }
+
 @media (max-width: 1200px) {
   .console-body { grid-template-columns: minmax(220px, 260px) 1fr; }
   .console-insights { grid-column: 2; }
 }
 
 @media (max-width: 768px) {
-  .console-body { grid-template-columns: 1fr; }
+  .console-body { grid-template-columns: 1fr; padding: var(--space-3); gap: var(--space-3); }
   .console-insights { grid-column: auto; }
-  .console-dialog { position: static; min-height: 0; }
+  .console-dialog { position: static; min-height: 0; padding: var(--space-3); }
+  .console-thread { max-height: 60vh; max-height: 60dvh; }
+  .bubble { max-width: 92%; }
+  .console-header { padding: var(--space-3); }
+  /* List -> detail: an open case hides the queue (and the empty "pick a case" box shows nowhere). */
+  .console-body.has-selection .console-list { display: none; }
+  .console-body:not(.has-selection) .console-empty-state { display: none; }
+  .console-back { display: inline-flex; }
 }

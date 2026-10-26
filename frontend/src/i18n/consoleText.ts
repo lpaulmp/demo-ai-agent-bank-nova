@@ -61,6 +61,7 @@ const consoleText = {
   'console.handedOver': 'Nova handed the conversation over to an agent',
   'console.insights': 'Case context',
   'console.queue': 'Ticket queue',
+  'console.back': 'Back to the queue',
   'console.refresh': 'Refresh',
   'faith.title': "Nova's faithfulness to the data",
   'faith.overall': "of Nova's checkable claims are in the data it consulted",

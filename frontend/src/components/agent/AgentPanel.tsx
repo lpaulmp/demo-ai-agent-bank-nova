@@ -15,6 +15,7 @@ import { FeedbackButtons } from './FeedbackButtons';
 import { SatisfactionPrompt } from './SatisfactionPrompt';
 import { IdlePrompt } from './IdlePrompt';
 import { useIdleTimer } from '../../hooks/useIdleTimer';
+import { isTouch, useMobilePanel } from '../../hooks/useMobilePanel';
 import { idleTimerEnabled } from '../../config/idleTimer';
 import { useAgent } from '../../context/AgentContext';
 import { useApp } from '../../context/AppContext';
@@ -208,6 +209,8 @@ export function AgentPanel() {
   const [showEscalation, setShowEscalation] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useMobilePanel(panelRef, isOpen || isFullView);
 
   // Inactivity: never while a human case is open, Nova is answering, the panel is closed, the
   // close dialog is up or the rating prompt (#99) waits for an answer. The automatic close skips
@@ -225,9 +228,9 @@ export function AgentPanel() {
     messagesEndRef.current?.scrollIntoView?.({ behavior: 'smooth' });
   }, [conversation.messages, isTyping]);
 
-  // Focus input when panel opens
+  // Focus input when panel opens (not on touch screens: the keyboard would cover the chat)
   useEffect(() => {
-    if (isOpen || isFullView) {
+    if ((isOpen || isFullView) && !isTouch()) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen, isFullView]);
@@ -281,6 +284,7 @@ export function AgentPanel() {
 
   return (
     <div
+      ref={panelRef}
       className={`agent-panel${isFullView ? ' agent-panel--full' : ''}`}
       role="complementary"
       aria-label={t('agent.title', language)}
